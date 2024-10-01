@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -23,19 +24,43 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool _isFollowing = false;
+  Timer? _followTimer;
+
+  void _toggleFollow() {
+    setState(() {
+      _isFollowing = true;
+    });
+    _followTimer?.cancel();
+    _followTimer = Timer(const Duration(seconds: 5), () {
+      setState(() {
+        _isFollowing = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _followTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(
-          title,
-        ),
+        title: Text(widget.title),
       ),
       body: Column(
         children: [
@@ -123,6 +148,26 @@ class MyHomePage extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: _toggleFollow,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isFollowing ? Colors.grey : Colors.blue,
+                  foregroundColor: _isFollowing ? Colors.white : Colors.white,
+                ),
+                child: Text(_isFollowing ? 'Following' : 'Follow'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Add message functionality here
+                },
+                child: const Text('Message'),
               ),
             ],
           ),
